@@ -1,9 +1,13 @@
 import sys
+import cmath
 import math
 
 """ Для красивой записи степеней """
 def superscript(n):
     return "".join(["⁰¹²³⁴⁵⁶⁷⁸⁹"[ord(c)-ord('0')] for c in str(n)])
+
+def subscript(n):
+    return "".join(["₀₁₂₃₄₅₆₇₈₉"[ord(c)-ord('0')] for c in str(n)])
 
 def errorMessage(str):
     print("Ошибка: " + str, file = sys.stderr)
@@ -35,7 +39,7 @@ def roundComplex(val, size = 4):
 
 def clearComplex(val):
     if isinstance(val, complex):
-        if val.imag == 0:
+        if val.imag == 0 or abs(val.imag) < 1e-4:
             return val.real
         else:
             return val
@@ -78,6 +82,7 @@ def complexRootExtraction(val, deg):
     if not isinstance(val, complex):
         val = val+0j
 
+    roots = []
     a = val.real
     b = val.imag
 
@@ -85,24 +90,45 @@ def complexRootExtraction(val, deg):
     arg = math.atan(b/a)
     cosz = math.cos(arg)
     sinz = math.sin(arg)
-    trig = cosz + sinz*j
+    trig = complex(cosz, sinz)
 
-    print("Начинаем извлечения корня {deg} степени из {val}")
-    print("Для начала требуется привести число к тригонометрической форме:")
+    print(f"\nНачинаем извлечения корня {deg} степени из {roundComplex(val)}")
+    print(f"\nДля начала требуется привести число к тригонометрической форме:")
     print(f"|z| = √(a{superscript(2)} + b{superscript(2)}) = √({roundComplex(a**2)} + {roundComplex(b**2)}) = {roundComplex(mod)}")
-    print(f"φ = atan(b/a) = atan({b}/{a}) = {roundComplex(arg)}")
-    print(f"sin(φ) = sin({arg}) = {sinz}; cos(φ) = cos({arg}) = {cosz}")
-    print(f"z = {mod} * {trig}")
+    print(f"φ = atan(b/a) = atan({roundComplex(b)}/{roundComplex(a)}) = {roundComplex(arg)}")
+    print(f"sin(φ) = sin({roundComplex(arg)}) = {roundComplex(sinz)}; cos(φ) = cos({roundComplex(arg)}) = {roundComplex(cosz)}")
+    print(f"\nz = {roundComplex(mod)}*{roundComplex(trig)}")
+    print(f"\nДля извлечения корня воспользуемся теоремой Муавра")
+    print(f"ᶰ√z = ᶰ√|z| * (cos[(φ+2πk)/n] + sin[(φ+2πk)/n]j")
+
+    mod = mod ** (1/deg)
+    for i in range(3):
+        angel = (arg + 2*i*math.pi)/deg
+        cosz = math.cos(angel)
+        sinz = math.sin(angel)
+        trig = complex(cosz, sinz)
+        roots.append(clearComplex(mod*trig))
+
+        print(f"\nВозьмём k = {i}")
+        print(f"φ{subscript(i)} = ({roundComplex(arg)} + {roundComplex(2*math.pi)}*{i})/{deg} = {roundComplex(angel)}")
+        print(f"cos (φ{subscript(i)}) = {roundComplex(cosz)}")
+        print(f"sin (φ{subscript(i)}) = {roundComplex(sinz)}")
+        print(f"{superscript(deg)}√z = {roundComplex(mod)} * {roundComplex(trig)} = {roundComplex(roots[i])}")
+
+    return roots
+
 
 """
 basePoly - изначальное уравнение
 workPoly - уравнение, с которым происходит работа
+answers - корни уравнения
 isTransformed - потребовалось ли привести уравнение к стандартному виду
 changedValue - значение -b/3a, не равно нулю если уравнение приводится к стандартному виду
 curSymbol - символ, которым записывается переменная
 """
 basePoly = [0, 0, 0, 0]
 workPoly = [0, 0, 0, 0]
+answers = []
 isTransformed = False
 changedValue = 0
 curSymbol = 'x'
@@ -141,7 +167,7 @@ if basePoly[1] != 0:
     tmpPolyList = []
     isTransformed = True
     curSymbol = 't'
-    changedValue = - divide(basePoly[1],  3*basePoly[0])
+    changedValue = -divide(basePoly[1],  3*basePoly[0])
     printedValue = -roundComplex(changedValue, 4)
 
     print("\nУравнение не в каноническом виде")
@@ -179,6 +205,7 @@ else:
 
 q = workPoly[-1]
 p = workPoly[-2]
+print(f"q = {roundComplex(q)}; p = {roundComplex(p)}")
 
 print("\nПриступаем к решению:")
 D = (q**2)/4 + (p**3)/27
@@ -189,12 +216,34 @@ print(f"+ {roundComplex(p**3)}/27 = {roundComplex(q**2/4)} + {roundComplex(p**3/
 D = clearComplex(D)
 
 if(not isinstance(D, complex)):
-    print("\nD - вещественное и", end = " ")
+    print("D - вещественное и", end = " ")
     if D > 0:
         print("> 0, следовательно имеет один вещественный и два комплексных корня)")
     elif D == 0:
         print("= 0, следовательно имеет три вещественных корня, из которых два - кратные")
     else:
-        print("< -, следовательно имеет три различных вещественных корня")
+        print("< 0, следовательно имеет три различных вещественных корня")
 
-dRoots = complexRootExtraction(D, 3)
+alphaPowered = -q/2 + cmath.sqrt(D)
+
+print(f"\nСчитаем корни")
+print(f"α{superscript(3)} = -q/2 + √D = {-roundComplex(q)}/2 + {roundComplex(cmath.sqrt(D))} = {-roundComplex(q)/2} + {roundComplex(cmath.sqrt(D))} = {roundComplex(alphaPowered)}")
+
+alphaRoots = complexRootExtraction(alphaPowered, 3)
+
+for i in range(len(alphaRoots)):
+    alpha = alphaRoots[i]
+    beta = (-p/3) / alpha
+    answers.append(alpha + beta)
+
+    print(f"\nКорень {i+1}")
+    print(f"{curSymbol}{subscript(i+1)} = α{subscript(i+1)} + β{subscript(i+1)}")
+    print(f"α{subscript(i+1)} = {roundComplex(alpha)}")
+    print(f"β{subscript(i+1)} = -p/3 / α{subscript(i+1)} = {roundComplex(-p)}/3*{roundComplex(alpha)} = {roundComplex(-p/3)}/{roundComplex(alpha)} = {roundComplex(beta)}")
+    print(f"{curSymbol}{subscript(i+1)} = {roundComplex(alpha)} + {roundComplex(beta)} = {roundComplex(answers[i])}")
+
+if isTransformed:
+    print("\nВозвращаемся к x:")
+    for i in range(len(answers)):
+        print(f"x{subscript(i)}={roundComplex(answers[i])} + {roundComplex(changedValue)} = {roundComplex(answers[i] + changedValue)}")
+        answers[i] += changedValue
