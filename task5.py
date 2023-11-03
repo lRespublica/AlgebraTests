@@ -69,10 +69,30 @@ def getPoweredPoly(changedValue, deg):
     return [binominal[x] * (changedValue ** x) for x in range(deg + 1)]
 
 """ Приведение некомплексных чисел к float """
-def cleanFromComplex(list):
-    for i in range(len(list)):
-        if list[i].imag == 0:
-            list[i] = list[i].real
+def cleanFromComplex(arr):
+    for i in range(len(arr)):
+        arr[i] = clearComplex(arr[i])
+
+""" Извлечение комплексных корней """
+def complexRootExtraction(val, deg):
+    if not isinstance(val, complex):
+        val = val+0j
+
+    a = val.real
+    b = val.imag
+
+    mod = math.sqrt(a**2 + b**2)
+    arg = math.atan(b/a)
+    cosz = math.cos(arg)
+    sinz = math.sin(arg)
+    trig = cosz + sinz*j
+
+    print("Начинаем извлечения корня {deg} степени из {val}")
+    print("Для начала требуется привести число к тригонометрической форме:")
+    print(f"|z| = √(a{superscript(2)} + b{superscript(2)}) = √({roundComplex(a**2)} + {roundComplex(b**2)}) = {roundComplex(mod)}")
+    print(f"φ = atan(b/a) = atan({b}/{a}) = {roundComplex(arg)}")
+    print(f"sin(φ) = sin({arg}) = {sinz}; cos(φ) = cos({arg}) = {cosz}")
+    print(f"z = {mod} * {trig}")
 
 """
 basePoly - изначальное уравнение
@@ -156,3 +176,25 @@ if basePoly[1] != 0:
 else:
     workPoly = basePoly
     print("\nУравнение в каноническом виде")
+
+q = workPoly[-1]
+p = workPoly[-2]
+
+print("\nПриступаем к решению:")
+D = (q**2)/4 + (p**3)/27
+print(f"Считаем D = q{superscript(2)}/4 + p{superscript(3)}/27 = {roundComplex(q**2)}/4", end = " ")
+print(f"+ {roundComplex(p**3)}/27 = {roundComplex(q**2/4)} + {roundComplex(p**3/27)} = {roundComplex(D)}")
+
+""" Приводим D, к float, если оно не комплексное """
+D = clearComplex(D)
+
+if(not isinstance(D, complex)):
+    print("\nD - вещественное и", end = " ")
+    if D > 0:
+        print("> 0, следовательно имеет один вещественный и два комплексных корня)")
+    elif D == 0:
+        print("= 0, следовательно имеет три вещественных корня, из которых два - кратные")
+    else:
+        print("< -, следовательно имеет три различных вещественных корня")
+
+dRoots = complexRootExtraction(D, 3)
