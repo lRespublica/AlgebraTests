@@ -87,7 +87,14 @@ def complexRootExtraction(val, deg):
     b = val.imag
 
     mod = math.sqrt(a**2 + b**2)
-    arg = math.atan(b/a)
+    if a >= 0 and b >= 0:
+        arg = math.atan(b/a)
+    elif a < 0 and b >= 0:
+        arg = (math.pi/2) + math.atan(abs(a/b))
+    elif a >= 0 and b < 0:
+        arg = - math.atan(abs(b/a))
+    else:
+        arg = (math.pi/2) + math.atan(abs(b/a))
     cosz = math.cos(arg)
     sinz = math.sin(arg)
     trig = complex(cosz, sinz)
@@ -95,7 +102,10 @@ def complexRootExtraction(val, deg):
     print(f"\nНачинаем извлечения корня {deg} степени из {roundComplex(val)}")
     print(f"\nДля начала требуется привести число к тригонометрической форме:")
     print(f"|z| = √(a{superscript(2)} + b{superscript(2)}) = √({roundComplex(a**2)} + {roundComplex(b**2)}) = {roundComplex(mod)}")
-    print(f"φ = atan(b/a) = atan({roundComplex(b)}/{roundComplex(a)}) = {roundComplex(arg)}")
+    if a < 0:
+        print(f"φ = π/2 + atan(|b/a|) = π/2 + atan(|{roundComplex(b)}/{roundComplex(a)}|) = π/2 + {roundComplex(math.atan(abs(a/b)))} = {roundComplex(arg)}")
+    else:
+        print(f"φ = atan(b/a) = atan({roundComplex(b)}/{roundComplex(a)}) = {roundComplex(arg)}")
     print(f"sin(φ) = sin({roundComplex(arg)}) = {roundComplex(sinz)}; cos(φ) = cos({roundComplex(arg)}) = {roundComplex(cosz)}")
     print(f"\nz = {roundComplex(mod)}*{roundComplex(trig)}")
     print(f"\nДля извлечения корня воспользуемся теоремой Муавра")
@@ -239,7 +249,7 @@ for i in range(len(alphaRoots)):
     print(f"\nКорень {i+1}")
     print(f"{curSymbol}{subscript(i+1)} = α{subscript(i+1)} + β{subscript(i+1)}")
     print(f"α{subscript(i+1)} = {roundComplex(alpha)}")
-    print(f"β{subscript(i+1)} = -p/3 / α{subscript(i+1)} = {roundComplex(-p)}/3*{roundComplex(alpha)} = {roundComplex(-p/3)}/{roundComplex(alpha)} = {roundComplex(beta)}")
+    print(f"β{subscript(i+1)} = -p/(3 * α{subscript(i+1)}) = {roundComplex(-p)}/3*(1/{roundComplex(alpha)}) = {roundComplex(-p/3)}/{roundComplex(alpha)} = {roundComplex(beta)}")
     print(f"{curSymbol}{subscript(i+1)} = {roundComplex(alpha)} + {roundComplex(beta)} = {roundComplex(answers[i])}")
 
 if isTransformed:
