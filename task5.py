@@ -101,11 +101,16 @@ def complexRootExtraction(val, deg):
 
     print(f"\nНачинаем извлечения корня {deg} степени из {roundComplex(val)}")
     print(f"\nДля начала требуется привести число к тригонометрической форме:")
+    print(f"a = {roundComplex(a)}; b = {roundComplex(b)};")
     print(f"|z| = √(a{superscript(2)} + b{superscript(2)}) = √({roundComplex(a**2)} + {roundComplex(b**2)}) = {roundComplex(mod)}")
-    if a < 0:
-        print(f"φ = π/2 + atan(|b/a|) = π/2 + atan(|{roundComplex(b)}/{roundComplex(a)}|) = π/2 + {roundComplex(math.atan(abs(a/b)))} = {roundComplex(arg)}")
-    else:
+    if a >= 0 and b >= 0:
         print(f"φ = atan(b/a) = atan({roundComplex(b)}/{roundComplex(a)}) = {roundComplex(arg)}")
+    elif a < 0 and b >= 0:
+        print(f"φ = π/2 + atan(|a/b|) = π/2 + atan(|{roundComplex(a)}/{roundComplex(b)}|) = π/2 + atan({roundComplex((abs(a/b)))}) = π/2 + {roundComplex(math.atan(abs(a/b)))} = {roundComplex(arg)}")
+    elif a >= 0 and b < 0:
+        print(f"φ = - atan(|b/a|) = - atan(|{roundComplex(b)}/{roundComplex(a)}|) = - {roundComplex(math.atan(abs(a/b)))} = {roundComplex(arg)}")
+    else:
+        print(f"φ = π/2 + atan(|b/a|) = π/2 + atan(|{roundComplex(b)}/{roundComplex(a)}|) = π/2 + {roundComplex(math.atan(abs(b/a)))} = {roundComplex(arg)}")
     print(f"sin(φ) = sin({roundComplex(arg)}) = {roundComplex(sinz)}; cos(φ) = cos({roundComplex(arg)}) = {roundComplex(cosz)}")
     print(f"\nz = {roundComplex(mod)}*{roundComplex(trig)}")
     print(f"\nДля извлечения корня воспользуемся теоремой Муавра")
