@@ -117,7 +117,7 @@ def complexRootExtraction(val, deg):
     print(f"ᶰ√z = ᶰ√|z| * (cos[(φ+2πk)/n] + sin[(φ+2πk)/n]j")
 
     mod = mod ** (1/deg)
-    for i in range(3):
+    for i in range(deg):
         angel = (arg + 2*i*math.pi)/deg
         cosz = math.cos(angel)
         sinz = math.sin(angel)
@@ -238,6 +238,8 @@ if(not isinstance(D, complex)):
         print("= 0, следовательно имеет три вещественных корня, из которых два - кратные")
     else:
         print("< 0, следовательно имеет три различных вещественных корня")
+else:
+    complexRootExtraction(D, 2)
 
 alphaPowered = -q/2 + cmath.sqrt(D)
 
