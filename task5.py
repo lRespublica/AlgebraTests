@@ -94,7 +94,7 @@ def complexRootExtraction(val, deg):
     elif a >= 0 and b < 0:
         arg = - math.atan(abs(b/a))
     else:
-        arg = (math.pi/2) + math.atan(abs(b/a))
+        arg = -(math.pi/2) - math.atan(abs(a/b))
     cosz = math.cos(arg)
     sinz = math.sin(arg)
     trig = complex(cosz, sinz)
